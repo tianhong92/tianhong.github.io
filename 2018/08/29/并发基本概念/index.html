@@ -1,18 +1,49 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>并发基本概念</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>并发基本概念</h1><h2 class="headline">Aug 29, 2018 3:59·491 words
-·2 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本概念"><span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CPU多级缓存"><span class="toc-text">CPU多级缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#缓存的意义（就算cache远远小于主存，-CPU访问经常不命中）："><span class="toc-text">缓存的意义（就算cache远远小于主存， CPU访问经常不命中）：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cpu多级缓存-缓存一致性（MESI协议）"><span class="toc-text">cpu多级缓存 - 缓存一致性（MESI协议）</span></a></li></ol></li></ol></div><section id="post-body"><h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>并发： 同时拥有两个或者多个线程， 如果程序在单核处理器上运行， 多个线程将交替地换入或者换出内存， 这些线程是同时“存在”的，每个线程处于执行过程中的某个状态， 如果运行在多核处理器上， 此时每个线程都能分配到一个处理器核上， 因此可以同时运行。</p>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>并发基本概念</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>并发基本概念</h1><h2 class="headline">Aug 29, 2018 3:59·1,781 words
+·6 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本概念"><span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CPU多级缓存"><span class="toc-text">CPU多级缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#缓存的意义（就算cache远远小于主存，-CPU访问经常不命中）："><span class="toc-text">缓存的意义（就算cache远远小于主存， CPU访问经常不命中）：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cpu多级缓存-缓存一致性（MESI协议）"><span class="toc-text">cpu多级缓存 - 缓存一致性（MESI协议）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#四个状态"><span class="toc-text">四个状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四种操作"><span class="toc-text">四种操作</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#乱序执行优化"><span class="toc-text">乱序执行优化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JAVA内存模型"><span class="toc-text">JAVA内存模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#同步八种操作"><span class="toc-text">同步八种操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#同步规则"><span class="toc-text">同步规则</span></a></li></ol></li></ol></div><section id="post-body"><h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>并发： 同时拥有两个或者多个线程， 如果程序在单核处理器上运行， 多个线程将交替地换入或者换出内存， 这些线程是同时“存在”的，每个线程处于执行过程中的某个状态， 如果运行在多核处理器上， 此时每个线程都能分配到一个处理器核上， 因此可以同时运行。</p>
 <p>高并发（High Concurrency）是互联网分布式系统架构设计中必须考虑的因素之一， 它通常是指， 通过设计保证系统能够<strong>同时并行处理</strong>很多请求。</p>
 <h2 id="CPU多级缓存"><a href="#CPU多级缓存" class="headerlink" title="CPU多级缓存"></a>CPU多级缓存</h2><p>CPU频率太快， 主存跟不上， 这样在处理器时钟周期内， CPU常常需要等待主存， 浪费资源。 cache出现， 是为了缓解CPU和主存之间速度不匹配 <strong>（速度 cpu &gt; cache &gt; memory）</strong>.</p>
 <h3 id="缓存的意义（就算cache远远小于主存，-CPU访问经常不命中）："><a href="#缓存的意义（就算cache远远小于主存，-CPU访问经常不命中）：" class="headerlink" title="缓存的意义（就算cache远远小于主存， CPU访问经常不命中）："></a>缓存的意义（就算cache远远小于主存， CPU访问经常不命中）：</h3><pre><code>* 时间局部性： 如果某个数据被访问， 那么不久将来也会被访问
 * 空间局部性： 如果某个数据被访问， 那么与它相邻的数据很快会被访问
-</code></pre><h3 id="cpu多级缓存-缓存一致性（MESI协议）"><a href="#cpu多级缓存-缓存一致性（MESI协议）" class="headerlink" title="cpu多级缓存 - 缓存一致性（MESI协议）"></a>cpu多级缓存 - 缓存一致性（MESI协议）</h3><p><img src="MESI_protocal.jpg" alt="MESI Protocal"></p>
-<ul>
-<li><p>Modified: 该缓存行只被缓存在该CPU的缓存中， 并且是被修改过（dirty），与主存的数据不一致。在允许其它CPU读取主存中相应内存之前需要写回（write back）主存。 写回后该缓存行状态变为独享（exclusive）状态。</p>
-</li>
-<li><p>Exclusive：该缓存行只被缓存在该CPU的缓存中， 未被修改。 和主存数据一致。任何时候在其它CPU读取内存时变为共享状态（shared）。</p>
-</li>
-<li><p>Shared：该缓存行被多个CPU缓存，各个缓存中数据与主存一致， 当一个CPU修改该缓存行， 其它CPU中该缓存行可以被作废（Invalid）</p>
-</li>
-<li><p>Invalid：该缓存是无效的。</p>
-</li>
-</ul>
+</code></pre><h3 id="cpu多级缓存-缓存一致性（MESI协议）"><a href="#cpu多级缓存-缓存一致性（MESI协议）" class="headerlink" title="cpu多级缓存 - 缓存一致性（MESI协议）"></a>cpu多级缓存 - 缓存一致性（MESI协议）</h3><p>MESI协议为了保证多个CPU cache之间缓存共享数据的一致性， 缓存控制器监听本地和远程操作的时候需要对地址一定的cache line状态做出修改。</p>
+<p><img src="MESI_protocal.jpg" alt="MESI Protocal"></p>
+<h4 id="四个状态"><a href="#四个状态" class="headerlink" title="四个状态"></a>四个状态</h4><ol>
+<li>Modified: 该缓存行只被缓存在该CPU的缓存中，并且是被修改过（dirty），与主存的数据不一致。在允许其它CPU读取主存中相应内存之前需要写回（write back）主存。 写回后该缓存行状态变为独享（exclusive）状态。</li>
+<li>Exclusive：该缓存行只被缓存在该CPU的缓存中， 未被修改。 和主存数据一致。任何时候在其它CPU读取内存时变为共享状态（shared）。</li>
+<li>Shared：该缓存行被多个CPU缓存，各个缓存中数据与主存一致， 当一个CPU修改该缓存行， 其它CPU中该缓存行可以被作废（Invalid）</li>
+<li>Invalid：该缓存是无效的。</li>
+</ol>
+<h4 id="四种操作"><a href="#四种操作" class="headerlink" title="四种操作"></a>四种操作</h4><ol>
+<li>Local read: 读本地缓存中的数据 </li>
+<li>Local write: 数据写入本地缓存</li>
+<li>Remote read: 读取主存中的数据</li>
+<li>Remote write: 数据写回主存</li>
+</ol>
+<h3 id="乱序执行优化"><a href="#乱序执行优化" class="headerlink" title="乱序执行优化"></a>乱序执行优化</h3><p>处理器为提高运算速度而做出违背代码原有顺序的优化。 举个例子：<br>一个核上执行数据准备操作，最后写一个标记表示准备就绪。 另外一个核通过标记来判断数据是否准备好。 这种操作存在标记位先写入问题。 数据可能还没有准备好。可能是没有计算完成， 也可能是数据没有从处理器缓存刷新到主存中。</p>
+<h2 id="JAVA内存模型"><a href="#JAVA内存模型" class="headerlink" title="JAVA内存模型"></a>JAVA内存模型</h2><p>屏蔽硬件和操作系统内存访问的差异， 在各种平台下达到一致的并发效果。JMM（Java Memory Model）是<strong>一种规范，规范了虚拟机与计算机内存是怎么工作的。一个线程如何，何时能看到其它线程修改过的共享变量的值。以及必须时如何同步的访问共享变量。</strong></p>
+<p>堆（Heap）： 运行时数据区， 运行时动态分配内存， 存取速度相对慢一些。<br>栈（Stack）： 存取速度比堆要快。仅次于寄存器。数据可以共享， 但是存在栈中的数据大小和生存期必须是确定的。缺乏灵活性。主要存放基本类型的变量和对象句柄。</p>
+<p><strong>当一个线程可以访问一个对象的时候， 它也可以访问该对象的成员变量。 如果两个线程同时调用同一个对象上的同一个方法， 它们将会都访问该对象的成员变量， 但是每个线程都拥有了该成员变量的私有拷贝。</strong></p>
+<p><img src="JMM.png" alt="JMM"></p>
+<p>JMM主内存就是硬件的内存，本地内存是cpu的寄存器和高速缓存的一个抽象描述。JVM的内存模型只是对物理内存的划分， 只存在内存中。</p>
+<h3 id="同步八种操作"><a href="#同步八种操作" class="headerlink" title="同步八种操作"></a>同步八种操作</h3><p><img src="JMM_caozuo.png" alt="JMM_8_Op"></p>
+<ol>
+<li>lock: 作用于主内存变量， 把一个变量标识为一条线程独占状态 </li>
+<li>unlock： 作用于主内存变量， 把一个处于锁定状态的变量释放出来， 释放后的变量才可以被其他线程锁定</li>
+<li>read： 作用于主内存的变量， 把一个变量从主内存传输到线程的工作内存中， 以便随后的load动作使用 </li>
+<li>load： 作用于工作内存的变量， 它把read操作从主内存中得到的变量值放入工作内存的变量副本中</li>
+<li>use： 作用于工作内存的变量， 把工作内存的一个变量值传递给执行引擎</li>
+<li>assign： 作用于工作内存的变量， 它把一个从执行引擎接收到的值赋值给工作内存的变量</li>
+<li>store： 作用于工作内存的变量， 把工作内存的一个变量的值传送到主内存中， 以便随后的write操作</li>
+<li>write： 作用于主内存的变量， 它把store操作从工作内存中得到的变量值放入主内存变量</li>
+</ol>
+<h3 id="同步规则"><a href="#同步规则" class="headerlink" title="同步规则"></a>同步规则</h3><ol>
+<li>不允许read和load、store和write操作之一单独出现</li>
+<li>把变量从主内存复制到工作内存， 就需要按顺序地执行read和load操作， 如果把变量从工作内存同步到主内存中， 就需要按顺序地执行store和write操作。 java内存模型只要求上述操作按顺序执行， 而没有保证必须是连续执行。</li>
+<li>不允许一个线程丢弃它最近的assign操作， 即变量在工作内存中改变之后必须同步到主内存中</li>
+<li>不允许一个线程没原因（没有发生任何assign操作）把数据同步回主内存中</li>
+<li>一个新的变量只能在主内存诞生， 不允许工作内存中直接使用一个未被初始化（load或assign）的变量。也就是对一个变量实施use和store操作前， 必须先执行assign和load操作</li>
+<li>一个变量同一时刻只允许一条线程对其lock操作， lock可以被同一条线程重复执行多次， lock和unlock必须成对出现</li>
+<li>对一个变量的lock操作， 将会清空工作内存中此变量的值， 在执行引擎使用这个变量前需要重新执行load或者assign操作初始化这个变量的值</li>
+<li>如果一个变量事先没有被lock操作锁定， 则不允许对它执行unlock操作， 也不允许去unlock一个被其他线程锁定的变量</li>
+<li>对一个变量执行unlcok操作前， 必须先把变量同步到主内存中（执行store和write操作）JMM_caozuo.PNG</li>
+</ol>
 </section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/08/20/Hexo-blog-framewrok/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
