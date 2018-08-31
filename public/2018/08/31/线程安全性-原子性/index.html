@@ -1,2 +1,48 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>线程安全性-原子性</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>线程安全性-原子性</h1><h2 class="headline">Aug 31, 2018 11:26·0 words
-·1 minutes read<span class="tags"></span></h2></header><section id="post-body"></section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/08/30/并发模拟/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>线程安全性-原子性</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>线程安全性-原子性</h1><h2 class="headline">Aug 31, 2018 11:26·320 words
+·1 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#线程安全性定义"><span class="toc-text">线程安全性定义</span></a></li></ol></div><section id="post-body"><h1 id="线程安全性定义"><a href="#线程安全性定义" class="headerlink" title="线程安全性定义"></a>线程安全性定义</h1><p>当多个线程访问某个类时， 不管运行时环境采取何种调度方式或者这些线程如果交替执行， 并且在主调代码中不需要任何额外的同步或协同， 这个类都能表现出真确的行为， 这个类就是线程安全的。</p>
+<p>线程安全性主要体现在3个方面：</p>
+<ol>
+<li>原子性</li>
+<li>可见性</li>
+<li>有序性</li>
+</ol>
+<pre><code>public class CountExample2 {
+    // 请求总数
+    public static int clientTotal = 5000;
+    // 同时并发执行的线程数
+    public static int threadTotal = 200;
+    public static AtomicInteger count = new AtomicInteger();
+
+    public static void main(String[] args) throws InterruptedException {
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        // 信号量
+        final Semaphore semaphore = new Semaphore(threadTotal);
+        // 计数器闭锁
+        final CountDownLatch countDownLatch = new CountDownLatch(clientTotal);
+        for(int i = 0; i &lt; clientTotal; i++){
+            executorService.execute(() -&gt; {
+                try {
+                    // 信号量模拟同时允许多少个线程执行， 达到一定并发数add会被阻塞
+                    semaphore.acquire();
+                    add();
+                    semaphore.release();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                        log.error(&quot;Exception&quot;, e);
+                }
+                    // 执行完一次， 计数值减一
+                    countDownLatch.countDown();
+            });
+        }
+        // 保证countdownLatch必须减为0， 这表明所有线程都执行完
+        countDownLatch.await();
+        executorService.shutdown();
+        log.info(&quot;Count:{}&quot;, count.get());
+    }
+
+    private static void add(){
+        count.incrementAndGet();
+    }
+}
+</code></pre><p>AtomicInteger类主要用到CAS的方式， 具体用到compareAndSwapInt函数， 累加前当前值（工作内存）和底层的值（主内存）比较，只有一样才累加。      </p>
+</section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/08/30/并发模拟/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
