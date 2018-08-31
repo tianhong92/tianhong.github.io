@@ -1,7 +1,7 @@
 ---
-title: Hexo blog framewrok
+title: Hexo blog framework
 date: 2018-08-20 17:00:41
-tags: self-study
+tags:
 ---
 
 I have been thinking for a while to create my own personal tech blog to record my tech studies. And I came accross Hexo, a simple blog framework for us to create our own blogs. It's super helpful for non front-end developers. Here are the steps you can follow.
@@ -57,6 +57,3 @@ At this point, creat a new blog is simply by typing the command
 	$ hexo new
 
 	
-
-
-
