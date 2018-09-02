@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>线程安全性-有序性</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>线程安全性-有序性</h1><h2 class="headline">Sep 02, 2018 10:30·212 words
+·1 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#有序性"><span class="toc-text">有序性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Happens-before原则"><span class="toc-text">Happens-before原则</span></a></li></ol></li></ol></div><section id="post-body"><h1 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h1><p>java内存模型， 允许编译器和处理器对指令重排序， 重排序结果不会影响单线程执行， 却会影响到多线程并发执行的正确性。</p>
+<p>synchronized, lock同一时间只允许一个线程执行同步代码， 让线程们顺序执行当然保证了有序性</p>
+<p>volatile也能保证一定的有序性</p>
+<h2 id="Happens-before原则"><a href="#Happens-before原则" class="headerlink" title="Happens-before原则"></a>Happens-before原则</h2><p>JMM先天的有序性（不需要通过任何手段就能保证的有序性）</p>
+<ul>
+<li>程序次序原则， 代码按书写次序执行（适用于单线程， 逻辑上看是按次序执行的， 因为有重排序）</li>
+<li>锁定原则， unlock先行发生于lock</li>
+<li>volatile变量规则， 对一个变量的写操作先行发生于读操作</li>
+<li>传递规则<br>。。。<br>后面的4条都很显而易见</li>
+</ul>
+</section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/09/01/线程安全性-可见性/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
