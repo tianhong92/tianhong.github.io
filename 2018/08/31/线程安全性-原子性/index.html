@@ -1,0 +1,49 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>线程安全性-原子性</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>线程安全性-原子性</h1><h2 class="headline">Aug 31, 2018 11:26·658 words
+·3 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#线程安全性定义"><span class="toc-text">线程安全性定义</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#原子性实现-Atomic包"><span class="toc-text">原子性实现-Atomic包</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#AtomicXXX-CAS"><span class="toc-text">AtomicXXX, CAS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AtomicLong-LongAdder"><span class="toc-text">AtomicLong, LongAdder</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AtomicReference-AtomicReferenceFieldUpdater"><span class="toc-text">AtomicReference, AtomicReferenceFieldUpdater</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AtomicStampReference-CAS的ABA问题"><span class="toc-text">AtomicStampReference: CAS的ABA问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#原子性-锁"><span class="toc-text">原子性 - 锁</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized-依赖JVM的同步锁"><span class="toc-text">synchronized:依赖JVM的同步锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Lock"><span class="toc-text">Lock</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#原子性-对比"><span class="toc-text">原子性 - 对比</span></a></li></ol></div><section id="post-body"><h1 id="线程安全性定义"><a href="#线程安全性定义" class="headerlink" title="线程安全性定义"></a>线程安全性定义</h1><p>当多个线程访问某个类时， 不管运行时环境采取何种调度方式或者这些线程如果交替执行， 并且在主调代码中不需要任何额外的同步或协同， 这个类都能表现出真确的行为， 这个类就是线程安全的。</p>
+<p>线程安全性主要体现在3个方面：</p>
+<ol>
+<li>原子性</li>
+<li>可见性</li>
+<li>有序性</li>
+</ol>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; Updated upstream</p>
+<h1 id="原子性实现-Atomic包"><a href="#原子性实现-Atomic包" class="headerlink" title="原子性实现-Atomic包"></a>原子性实现-Atomic包</h1><h2 id="AtomicXXX-CAS"><a href="#AtomicXXX-CAS" class="headerlink" title="AtomicXXX, CAS"></a>AtomicXXX, CAS</h2><p>比如AtomicInteger类主要用到CAS的方式， 具体用到compareAndSwapInt函数， 累加前当前值（工作内存）和底层的值（主内存）需要比较，只有一样才累加。  并发环境下CAS失败率高， 一个线程的原子操作可能循环多次尝试，影响性能。      </p>
+<h2 id="AtomicLong-LongAdder"><a href="#AtomicLong-LongAdder" class="headerlink" title="AtomicLong, LongAdder"></a>AtomicLong, LongAdder</h2><p>JDK8新增了LongAdder, 和AtomicLong有相似点。 LongAdder有优点，把热点数据分离， 把AtomicLong内部核心数据value被分为一个数组（多个cell）。 每个线程访问时候根据哈希等方法映射到一个节点进行计数。 最终结果为各个节点数据求和累加。 LongAdder等于把AtomicLong单点的更新压力分散到多个节点上。 低并发环境下通过对base的直接更新可以保证和AtomicLong效率基本相同。<br>缺点是统计时候如果有并发更新统计数据可能会有误差。 如果要生成全局唯一的序列号就不适合用LongAdder。</p>
+<h2 id="AtomicReference-AtomicReferenceFieldUpdater"><a href="#AtomicReference-AtomicReferenceFieldUpdater" class="headerlink" title="AtomicReference, AtomicReferenceFieldUpdater"></a>AtomicReference, AtomicReferenceFieldUpdater</h2><pre><code>public class AtomicReferenceExample {
+    private static AtomicReference&lt;Integer&gt; count = new AtomicReference(0);
+    public static void main(String[] args) {
+        count.compareAndSet(0, 2);
+        count.compareAndSet(2, 4);
+        log.info(&quot;count: {}&quot;, count.get());
+    }
+}
+
+
+public class AtomicFieldUpdaterExample {
+    private static AtomicIntegerFieldUpdater&lt;AtomicFieldUpdaterExample&gt; updater =
+        AtomicIntegerFieldUpdater.newUpdater(AtomicFieldUpdaterExample.class, &quot;count&quot;);
+    @Getter
+    public volatile int count = 100;
+
+    public static void main(String[] args) {
+        AtomicFieldUpdaterExample example = new AtomicFieldUpdaterExample();
+        if(updater.compareAndSet(example, 100, 120)) {
+            log.info(&quot;update success 1, {}&quot;, example.getCount());
+        }
+        if(updater.compareAndSet(example, 100, 120)){
+            log.info(&quot;update success 2, {}&quot;, example.getCount());
+        } else {
+            log.info(&quot;update fail, {}&quot;, example.getCount());
+        }
+    }
+}
+只能更新非static的volatile变量
+</code></pre><h2 id="AtomicStampReference-CAS的ABA问题"><a href="#AtomicStampReference-CAS的ABA问题" class="headerlink" title="AtomicStampReference: CAS的ABA问题"></a>AtomicStampReference: CAS的ABA问题</h2><p>一个线程把变量A变为B又变回A， 这时候需要维护一个变化的Stamp来反映变量确实变化过。</p>
+<h1 id="原子性-锁"><a href="#原子性-锁" class="headerlink" title="原子性 - 锁"></a>原子性 - 锁</h1><h2 id="synchronized-依赖JVM的同步锁"><a href="#synchronized-依赖JVM的同步锁" class="headerlink" title="synchronized:依赖JVM的同步锁"></a>synchronized:依赖JVM的同步锁</h2><p>修饰代码块： 作用于调用的对象<br>修饰方法： 作用于调用的对象<br>修饰静态方法： 作用于所有对象<br>修饰类： 作用于所有对象</p>
+<h2 id="Lock"><a href="#Lock" class="headerlink" title="Lock"></a>Lock</h2><p>依赖特殊的CPU指令， 代码实现， Reentrantlock</p>
+<h1 id="原子性-对比"><a href="#原子性-对比" class="headerlink" title="原子性 - 对比"></a>原子性 - 对比</h1><ul>
+<li>Synchronized: 不可中断锁， 适合竞争不激烈， 可读性好</li>
+<li>Lock: 可中断锁（unlock）， 多样化同步， 竞争激烈时能维持常态</li>
+<li>Atomic： 竞争激烈时能维持常态， 比lock性能好， 只能同步一个值</li>
+</ul>
+</section><nav id="post-nav"><span class="prev"><a href="/2018/09/01/线程安全性-可见性/"><span class="arrow">←</span>Newer Posts</a></span><span class="next"><a href="/2018/08/30/并发模拟/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>

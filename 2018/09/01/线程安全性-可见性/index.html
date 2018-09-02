@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>线程安全性-可见性</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>线程安全性-可见性</h1><h2 class="headline">Sep 01, 2018 7:37·215 words
+·1 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#可见性"><span class="toc-text">可见性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#JMM关于synchronized的规定"><span class="toc-text">JMM关于synchronized的规定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#volatile"><span class="toc-text">volatile</span></a></li></ol></li></ol></div><section id="post-body"><h1 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h1><p>导致共享变量在线程间不可见的原因</p>
+<ol>
+<li>线程交叉执行</li>
+<li>重排序</li>
+<li>共享变量更新后的值没有在工作内存和主内存及时更新</li>
+</ol>
+<h2 id="JMM关于synchronized的规定"><a href="#JMM关于synchronized的规定" class="headerlink" title="JMM关于synchronized的规定"></a>JMM关于synchronized的规定</h2><ol>
+<li>线程解锁前， 必须把共享变量最新值刷新到主内存</li>
+<li>线程加锁前， 将清空工作变量中共享变量的值， 从而使用时需要从主内存重新读取最新的值</li>
+</ol>
+<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><p>通过加入内存屏障和禁止重排序优化来实现<br>对volatile变量写操作时， 会在写操作后加入一条store屏障指令， 将本地内存中的共享变量刷新到主内存<br>对volatile变量读操作时， 会在读操作前加入一条load屏障指令， 从内存中读取共享变量</p>
+<p><img src="reorder_read.png" alt="reorder_read"><br><img src="reorder_write.png" alt="MESI Protocal"></p>
+</section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/08/31/线程安全性-原子性/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
