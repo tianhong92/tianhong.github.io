@@ -1,5 +1,5 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>安全发布对象</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>安全发布对象</h1><h2 class="headline">Sep 02, 2018 10:49·151 words
-·1 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#基本概念"><span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#安全发布的方法"><span class="toc-text">安全发布的方法</span></a></li></ol></div><section id="post-body"><h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><ol>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>安全发布对象</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>安全发布对象</h1><h2 class="headline">Sep 02, 2018 10:49·530 words
+·2 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#基本概念"><span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#安全发布的方法"><span class="toc-text">安全发布的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#单例模式发布对象"><span class="toc-text">单例模式发布对象</span></a></li></ol></li></ol></div><section id="post-body"><h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><ol>
 <li>发布对象： 使一个对象能够被当前范围之外的代码所使用</li>
 <li>对象逸出： 一种错误的发布， 当一个对象还没构造完成时， 就使它被其他线程所见</li>
 </ol>
@@ -9,4 +9,58 @@
 <li>将对象的引用保存在某个正确构造对象的final类型域中</li>
 <li>将对象的引用保存在一个由锁保护的域中</li>
 </ol>
-</section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/09/02/线程安全性-有序性/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
+<h2 id="单例模式发布对象"><a href="#单例模式发布对象" class="headerlink" title="单例模式发布对象"></a>单例模式发布对象</h2><ol>
+<li>懒汉模式（通过加锁来确保线程安全， 第一次使用到单例实例的时候进行创建）</li>
+</ol>
+<p>// 双重同步锁检测机制不是线程安全的<br>// 1. memory = allocate() 分配对象内存空间<br>// 2. ctorInstance() 初始化对象<br>// 3. instance = memory 设置instance指向刚分配的内存<br>// JVM和cpu优化， 发生了指令重拍<br>// 1. memory = allocate() 分配对象内存空间<br>// 3. instance = memory 设置instance指向刚分配的内存<br>// 2. ctorInstance() 初始化对象<br>// 线程A执行到3， 线程B会以为instance已经创建好了， 实际上还没有初始化</p>
+<pre><code> // 单例对象
+private static SingletonExample1 instance = null;
+
+// 静态的工厂方法
+public static SingletonExample1 getInstance(){
+    if(instance == null){ //双重检测机制
+        synchronized (SingletonExample2.class) {
+            if (instance == null) {
+                instance = new SingletonExample1();
+            }
+        }
+    }
+    return instance;
+}
+
+*所以单例对象要加volatile， 总结下， volatile使用场景， 一个是状态表示量， 一个是双重检测*   
+</code></pre><ol start="2">
+<li>饿汉模式（线程安全，单例实例在类装载的时候进行创建）</li>
+</ol>
+<p>可以通过静态域或者静态块的方式， 单例模式构造方法为private， 防止程序其他地方调用构造方法</p>
+<pre><code>private SingletonExample2(){ }
+public static SingletonExample2 instance = null;
+static{
+    instance = new SingletonExample2();
+}
+public SingletonExample2 getInstance(){
+    return instance;
+}
+</code></pre><ol start="3">
+<li><p>枚举模式</p>
+<p> public class SingletonExample3 {</p>
+<pre><code>private SingletonExample3(){ }
+public static SingletonExample3 getInstance(){
+    return Singleton.INSTANCE.getInstance();
+}
+private enum Singleton {
+    INSTANCE;
+    private SingletonExample3 singletonExample;
+    // JVM 保证这个方法绝对只调用一次
+    Singleton(){
+        singletonExample = new SingletonExample3();
+    }
+    public SingletonExample3 getInstance(){
+        return singletonExample;
+    }
+}
+</code></pre><p> }</p>
+</li>
+</ol>
+<p>最安全， 同时像饿汉模式一样在类加载时候初始化</p>
+</section><nav id="post-nav"><span class="prev"><a href="/2018/09/03/不可变对象/"><span class="arrow">←</span>Newer Posts</a></span><span class="next"><a href="/2018/09/02/线程安全性-有序性/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
