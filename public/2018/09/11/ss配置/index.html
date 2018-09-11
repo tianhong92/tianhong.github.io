@@ -1,51 +1,39 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ss配置</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>ss配置</h1><h2 class="headline">Sep 11, 2018 1:43·368 words
-·2 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Server搭建"><span class="toc-text">Server搭建</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Server-Config"><span class="toc-text">Server Config</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#安装锐速-bbr-加速"><span class="toc-text">安装锐速+bbr 加速</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Clients"><span class="toc-text">Clients</span></a></li></ol></div><section id="post-body"><h1 id="Server搭建"><a href="#Server搭建" class="headerlink" title="Server搭建"></a>Server搭建</h1><ol>
-<li><p>下载shadowsocks服务安装脚本<br> wget –no-check-certificate  <a href="https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks.sh" target="_blank" rel="noopener">https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks.sh</a></p>
-</li>
-<li><p>修改脚本权限<br> chmod +x shadowsocks.sh</p>
-</li>
-<li><p>运行安装脚本<br> ./shadowsocks.sh 2&gt;&amp;1 | tee shadowsocks.log</p>
-</li>
-</ol>
-<p>设置密码， 加密算法选择aes-256-cfb</p>
-<h1 id="Server-Config"><a href="#Server-Config" class="headerlink" title="Server Config"></a>Server Config</h1><ol>
-<li><p>卸载方法<br> ./shadowsocks.sh uninstall</p>
-</li>
-<li><p>多用户多端口配置文件示例</p>
-<p> {</p>
-<pre><code>&quot;server&quot;:&quot;0.0.0.0&quot;,
-&quot;local_address&quot;:&quot;127.0.0.1&quot;,
-    &quot;local_port&quot;:1080,
-&quot;port_password&quot;:{
-     &quot;8989&quot;:&quot;password0&quot;,
-     &quot;9001&quot;:&quot;password1&quot;,
-     &quot;9002&quot;:&quot;password2&quot;,
-     &quot;9003&quot;:&quot;password3&quot;,
-     &quot;9004&quot;:&quot;password4&quot;
-},
-&quot;timeout&quot;:300,
-&quot;method&quot;:&quot;your_encryption_method&quot;,
-&quot;fast_open&quot;: false
-</code></pre><p> }<br>配置多端口后，需要防火墙打开新增的端口。安装脚本中默认单端口。</p>
-<p> centos7 防火墙命令<br>  firewall-cmd –permanent –zone=public –add-port=8990/tcp<br>  firewall-cmd –permanent –zone=public –add-port=8990/udp<br>  firewall-cmd  –reload</p>
-</li>
-</ol>
-<p>用我爱共产党命令</p>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ss配置</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>ss配置</h1><h2 class="headline">Sep 11, 2018 1:43·337 words
+·2 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Server搭建"><span class="toc-text">Server搭建</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#下载shadowsocks服务安装脚本"><span class="toc-text">下载shadowsocks服务安装脚本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改脚本权限"><span class="toc-text">修改脚本权限</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#运行安装脚本"><span class="toc-text">运行安装脚本</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Server-Config"><span class="toc-text">Server Config</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#卸载方法"><span class="toc-text">卸载方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多用户多端口配置文件示例"><span class="toc-text">多用户多端口配置文件示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#防火墙设置"><span class="toc-text">防火墙设置</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#安装锐速-bbr-加速"><span class="toc-text">安装锐速+bbr 加速</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#更换centos内核"><span class="toc-text">更换centos内核</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装锐速"><span class="toc-text">安装锐速</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用google-bbr"><span class="toc-text">使用google bbr</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Clients"><span class="toc-text">Clients</span></a></li></ol></div><section id="post-body"><h1 id="Server搭建"><a href="#Server搭建" class="headerlink" title="Server搭建"></a>Server搭建</h1><h2 id="下载shadowsocks服务安装脚本"><a href="#下载shadowsocks服务安装脚本" class="headerlink" title="下载shadowsocks服务安装脚本"></a>下载shadowsocks服务安装脚本</h2><pre><code>wget --no-check-certificate  https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks.sh
+</code></pre><h2 id="修改脚本权限"><a href="#修改脚本权限" class="headerlink" title="修改脚本权限"></a>修改脚本权限</h2><pre><code>chmod +x shadowsocks.sh
+</code></pre><h2 id="运行安装脚本"><a href="#运行安装脚本" class="headerlink" title="运行安装脚本"></a>运行安装脚本</h2><pre><code>./shadowsocks.sh 2&gt;&amp;1 | tee shadowsocks.log
+</code></pre><p>  设置密码， 加密算法选择aes-256-cfb</p>
+<h1 id="Server-Config"><a href="#Server-Config" class="headerlink" title="Server Config"></a>Server Config</h1><h2 id="卸载方法"><a href="#卸载方法" class="headerlink" title="卸载方法"></a>卸载方法</h2><pre><code>./shadowsocks.sh uninstall
+</code></pre><h2 id="多用户多端口配置文件示例"><a href="#多用户多端口配置文件示例" class="headerlink" title="多用户多端口配置文件示例"></a>多用户多端口配置文件示例</h2><pre><code>{
+    &quot;server&quot;:&quot;0.0.0.0&quot;,
+    &quot;local_address&quot;:&quot;127.0.0.1&quot;,
+         &quot;local_port&quot;:1080,
+    &quot;port_password&quot;:{
+         &quot;8989&quot;:&quot;password0&quot;,
+         &quot;9001&quot;:&quot;password1&quot;,
+         &quot;9002&quot;:&quot;password2&quot;,
+         &quot;9003&quot;:&quot;password3&quot;,
+         &quot;9004&quot;:&quot;password4&quot;
+    },
+    &quot;timeout&quot;:300,
+    &quot;method&quot;:&quot;your_encryption_method&quot;,
+    &quot;fast_open&quot;: false
+}
+</code></pre><h2 id="防火墙设置"><a href="#防火墙设置" class="headerlink" title="防火墙设置"></a>防火墙设置</h2><pre><code>centos7 防火墙命令
+firewall-cmd --permanent --zone=public --add-port=8990/tcp
+firewall-cmd --permanent --zone=public --add-port=8990/udp
+firewall-cmd  --reload    
+</code></pre><p>用我爱共产党命令</p>
 <pre><code>启动：/etc/init.d/shadowsocks start
-
 停止：/etc/init.d/shadowsocks stop
-
 重启：/etc/init.d/shadowsocks restart
-
 状态：/etc/init.d/shadowsocks status
-</code></pre><h1 id="安装锐速-bbr-加速"><a href="#安装锐速-bbr-加速" class="headerlink" title="安装锐速+bbr 加速"></a>安装锐速+bbr 加速</h1><ol>
-<li>更换centos内核<br> rpm -ivh <a href="http://soft.91yun.org/ISO/Linux/CentOS/kernel/kernel-3.10.0-229.1.2.el7.x86_64.rpm" target="_blank" rel="noopener">http://soft.91yun.org/ISO/Linux/CentOS/kernel/kernel-3.10.0-229.1.2.el7.x86_64.rpm</a> –force</li>
-<li>安装锐速<br> wget -N –no-check-certificate <a href="https://raw.githubusercontent.com/91yun/serverspeeder/master/serverspeeder-all.sh" target="_blank" rel="noopener">https://raw.githubusercontent.com/91yun/serverspeeder/master/serverspeeder-all.sh</a> &amp;&amp; bash serverspeeder-all.sh</li>
-</ol>
-<p>可能会提示内核版本问题，选择一个最接近的版本即可</p>
-<ol start="3">
-<li>使用google bbr<br> wget –no-check-certificate <a href="https://github.com/teddysun/across/raw/master/bbr.sh">https://github.com/teddysun/across/raw/master/bbr.sh</a><br> chmod +x bbr.sh<br> ./bbr.sh</li>
-</ol>
-<p>Google 开源了其 TCP BBR 拥塞控制算法，并提交到了 Linux 内核，从 4.9 开始，Linux 内核已经用上了该算法。    </p>
+</code></pre><h1 id="安装锐速-bbr-加速"><a href="#安装锐速-bbr-加速" class="headerlink" title="安装锐速+bbr 加速"></a>安装锐速+bbr 加速</h1><h2 id="更换centos内核"><a href="#更换centos内核" class="headerlink" title="更换centos内核"></a>更换centos内核</h2><pre><code>rpm -ivh http://soft.91yun.org/ISO/Linux/CentOS/kernel/kernel-3.10.0-229.1.2.el7.x86_64.rpm --force
+</code></pre><h2 id="安装锐速"><a href="#安装锐速" class="headerlink" title="安装锐速"></a>安装锐速</h2><pre><code>wget -N --no-check-certificate https://raw.githubusercontent.com/91yun/serverspeeder/master/serverspeeder-all.sh &amp;&amp; bash serverspeeder-all.sh
+</code></pre><p>可能会提示内核版本问题，选择一个最接近的版本即可</p>
+<h2 id="使用google-bbr"><a href="#使用google-bbr" class="headerlink" title="使用google bbr"></a>使用google bbr</h2><pre><code>wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh
+chmod +x bbr.sh
+./bbr.sh
+</code></pre><p>Google 开源了其 TCP BBR 拥塞控制算法，并提交到了 Linux 内核，从 4.9 开始，Linux 内核已经用上了该算法。    </p>
 <h1 id="Clients"><a href="#Clients" class="headerlink" title="Clients"></a>Clients</h1><p>不同平台有对应的客户端：<a href="https://shadowsocks.org/en/download/clients.html" target="_blank" rel="noopener">https://shadowsocks.org/en/download/clients.html</a></p>
 </section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/09/07/数据结构-集合和映射/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
