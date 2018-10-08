@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>线程池</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>线程池</h1><h2 class="headline">Oct 04, 2018 2:14·604 words
+·2 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#线程池"><span class="toc-text">线程池</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#拒绝策略"><span class="toc-text">拒绝策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#线程池状态"><span class="toc-text">线程池状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ThreadPoolExecutor提供的方法"><span class="toc-text">ThreadPoolExecutor提供的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Executor框架接口"><span class="toc-text">Executor框架接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#线程池合理配置"><span class="toc-text">线程池合理配置</span></a></li></ol></li></ol></div><section id="post-body"><h1 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h1><ol>
+<li>重用存在的线程， 减少创建， 消亡开销</li>
+<li>有效控制最大并发线程数，提高系统资源利用率</li>
+<li>提供定时执行， 定期执行， 单线程， 并发数控制功能</li>
+</ol>
+<p>注意三个参数： corePoolSize, maximumPoolSize, workQueue</p>
+<p>workQueue可以是SynchronousQueue直接切换， 也可以是无界队列（LinkedBlockingQueue）这时maximumPoolSize不起作用。<br>也可以为有界队列（ArrayBlockingQueue）</p>
+<p>如果要减低cpu 内存消耗， 可以设置较小的线程池容量， 较大的队列容量。<br>如果老阻塞， 可以增大线程池大小。</p>
+<p>keepAliveTime:  线程没有任务执行时最多保持多久<br>unit： KeepAliveTime时间单位<br>threadFactory: 线程工厂<br>rejectHandler: 拒绝处理任务时的策略</p>
+<h2 id="拒绝策略"><a href="#拒绝策略" class="headerlink" title="拒绝策略"></a>拒绝策略</h2><ol>
+<li>默认为抛异常</li>
+<li>用调用者所在线程执行任务</li>
+<li>丢弃队列中最前的任务， 执行当前任务</li>
+<li>直接丢弃任务</li>
+</ol>
+<h2 id="线程池状态"><a href="#线程池状态" class="headerlink" title="线程池状态"></a>线程池状态</h2><ul>
+<li>Running： 能接受新提交的任务， 也能处理阻塞队列中的任务</li>
+<li>Shutdown： 不能接受新的任务， 能处理阻塞队列中的任务</li>
+<li>Stop: 不能再接受新任务， 不能处理队列中的任务， 终端在处理任务的线程</li>
+<li>Tidying： 线程池中工作线程数为0， 可以进入该状态</li>
+<li>Terminated</li>
+</ul>
+<h2 id="ThreadPoolExecutor提供的方法"><a href="#ThreadPoolExecutor提供的方法" class="headerlink" title="ThreadPoolExecutor提供的方法"></a>ThreadPoolExecutor提供的方法</h2><ul>
+<li>execute(): 提交任务， 交给线程池执行</li>
+<li>submit(): 提交任务， 能返回执行结果，execute+future</li>
+<li>shutdown(): 等任务都执行完</li>
+<li><p>shutdownNow(): 不等任务执行完就关闭</p>
+</li>
+<li><p>getTaskCount()</p>
+</li>
+<li>getCompletedTaskCount()</li>
+<li>getPoolSize() 池中现在的线程数量</li>
+<li>getActiveCount() 当前线程池正在执行任务的线程数</li>
+</ul>
+<p>可以在监控类中传入ThreadPoolExecutor实例， 记录下这些数据放入监控图表里面</p>
+<h2 id="Executor框架接口"><a href="#Executor框架接口" class="headerlink" title="Executor框架接口"></a>Executor框架接口</h2><ul>
+<li>Executors.newCachedThreadPool 可创建一个可缓存的线程池， 可以灵活回收空闲线程， 或者新建线程</li>
+<li>newFixedThreadPool 定长线程池， 可控制最大并发数， 超出线程在队列中等待</li>
+<li>newScheduledThreadPool 定长线程池， 支持定时和周期性任务执行</li>
+<li>newSingleThreadExecutor: 单线程线程池， 每个任务按指定顺序（先到先出， 优先级）执行</li>
+</ul>
+<h2 id="线程池合理配置"><a href="#线程池合理配置" class="headerlink" title="线程池合理配置"></a>线程池合理配置</h2><p>CPU密集型任务， 就需要尽量压榨CPU， 参考值为NCPU+1<br>IO密集型任务， 参考值为两倍CPU</p>
+<p>任务很小时候， 线程池调度时间和任务时间差不多， 不适合用线程池</p>
+</section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/10/04/JUC-ForkJoin-BlockingQueue/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
