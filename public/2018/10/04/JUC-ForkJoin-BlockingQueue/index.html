@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>JUC-ForkJoin</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>JUC-ForkJoin</h1><h2 class="headline">Oct 04, 2018 1:35·368 words
+·1 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Fork-Join框架"><span class="toc-text">Fork Join框架</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#局限性"><span class="toc-text">局限性</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Blocking-Queue"><span class="toc-text">Blocking Queue</span></a></li></ol></div><section id="post-body"><p>Java 7 提供的用于并行执行任务的框架， 把大任务分为多个小任务， 再汇总每个小任务结果得到大任务结果</p>
+<h1 id="Fork-Join框架"><a href="#Fork-Join框架" class="headerlink" title="Fork Join框架"></a>Fork Join框架</h1><ul>
+<li>Fork 把大任务分为多个小任务并行执行</li>
+<li>Join 合并子任务结果</li>
+<li>工作窃取算法， 使用双端队列， 窃取线程从被窃取线程队列尾部开始拿任务， 被窃取线程从头部开始拿任务。减少线程竞争， 某些场合还是有竞争， 比如双端队列只有一个任务时候。</li>
+</ul>
+<h2 id="局限性"><a href="#局限性" class="headerlink" title="局限性"></a>局限性</h2><ol>
+<li>任务只能通过fork join来同步</li>
+<li>小任务不能执行IO任务</li>
+</ol>
+<h1 id="Blocking-Queue"><a href="#Blocking-Queue" class="headerlink" title="Blocking Queue"></a>Blocking Queue</h1><p>阻塞的情况：</p>
+<ol>
+<li>队列满了入队</li>
+<li>队列空出队<br>阻塞队列是线程安全的， 其实就是一个线程生产， 另外一个线程消费的场景</li>
+</ol>
+<p>实现类</p>
+<ol>
+<li>ArrayBlockingQueue: 有界阻塞队列， 容量有限， 初始化时候定大小。 先进先出。</li>
+<li>DelayQueue: 无界阻塞队列，继承comparable接口， 因为delayqueue内部元素需要排序。 一般按元素过期时间优先级进行排序。 用于定时关闭连接， 缓存对象， 超时处理。内部实现用到锁和排序</li>
+<li>LinkedBlockingQueue: 初始化指定大小就是有边界， 不然无边界。 </li>
+<li>PriorityBlcokingQueue： 允许null对象， 无边界有排序规则。</li>
+<li>SynchronousQueue: 只允许容纳一个元素， 有一个元素就阻塞。</li>
+</ol>
+</section><nav id="post-nav"><span class="prev"><a href="/2018/10/04/线程池/"><span class="arrow">←</span>Newer Posts</a></span><span class="next"><a href="/2018/09/11/ss配置/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
