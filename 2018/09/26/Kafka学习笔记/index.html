@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kafka学习笔记</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>Kafka学习笔记</h1><h2 class="headline">Sep 26, 2018 3:44·255 words
+·1 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Kafka基本概念"><span class="toc-text">Kafka基本概念</span></a></li></ol></div><section id="post-body"><h1 id="Kafka基本概念"><a href="#Kafka基本概念" class="headerlink" title="Kafka基本概念"></a>Kafka基本概念</h1><ul>
+<li>Producer: 消息和数据生产者， 向Kafka的一个topic发布消息和进程/代码/服务</li>
+<li>Consumer: 消息和数据的消费者， 订阅数据（Topic）并且处理其发布的消息的进程/代码/服务</li>
+<li>Consumer Group: 逻辑概念， 对于同一个topic， 会广播给不同的group, 一个group中， 只有一个consumer可以消费该消息</li>
+<li>Broker: 物理概念， Kafka集群中的每个Kafka节点</li>
+<li>Topic：逻辑概念， Kafka消息的类别， 对数据区分， 隔离</li>
+<li>Partition: 物理概念， Kafka下数据存储的基本单元。 一个Topic数据， 会被分散存储到多个Partition， 每一个Partition是有序的</li>
+<li>Replication: 同一个Partition可能会有多个Replica， 多个Replica之间数据是一样的</li>
+<li>Replication Leader: 一个Partition的多个Replica上， 需要一个leader负责该Partition上的Producer和Consumer交互</li>
+<li>ReplicaManager: 负责管理当前Broker所有分区和副本的信息， 处理KafkaController发起的一些请求， 副本状态的切换，添加，读取消息等</li>
+</ul>
+</section><nav id="post-nav"><span class="prev"><a href="/2018/10/04/JUC-ForkJoin-BlockingQueue/"><span class="arrow">←</span>Newer Posts</a></span><span class="next"><a href="/2018/09/11/ss配置/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
