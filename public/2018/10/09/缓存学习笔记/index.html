@@ -1,5 +1,5 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>缓存学习笔记</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>缓存学习笔记</h1><h2 class="headline">Oct 09, 2018 1:41·792 words
-·3 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#缓存特征"><span class="toc-text">缓存特征</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#影响缓存命中率的因素"><span class="toc-text">影响缓存命中率的因素</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存分类和应用场景"><span class="toc-text">缓存分类和应用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Guava-Cache"><span class="toc-text">Guava Cache</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Memcache"><span class="toc-text">Memcache</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#memcache内存结构"><span class="toc-text">memcache内存结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis"><span class="toc-text">Redis</span></a></li></ol></li></ol></div><section id="post-body"><h1 id="缓存特征"><a href="#缓存特征" class="headerlink" title="缓存特征"></a>缓存特征</h1><ul>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>缓存学习笔记</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>缓存学习笔记</h1><h2 class="headline">Oct 09, 2018 1:41·1,804 words
+·6 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#缓存特征"><span class="toc-text">缓存特征</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#影响缓存命中率的因素"><span class="toc-text">影响缓存命中率的因素</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存分类和应用场景"><span class="toc-text">缓存分类和应用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Guava-Cache"><span class="toc-text">Guava Cache</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Memcache"><span class="toc-text">Memcache</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#memcache内存结构"><span class="toc-text">memcache内存结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis"><span class="toc-text">Redis</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#五种数据类型"><span class="toc-text">五种数据类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#持久化的方式"><span class="toc-text">持久化的方式</span></a></li></ol></li></ol></li></ol></div><section id="post-body"><h1 id="缓存特征"><a href="#缓存特征" class="headerlink" title="缓存特征"></a>缓存特征</h1><ul>
 <li>命中率： 命中数/(命中数+没有命中数)</li>
 <li>最大元素（空间）</li>
 </ul>
@@ -21,7 +21,32 @@
 <li>分布式缓存： Memcache、 Redis</li>
 </ul>
 <h2 id="Guava-Cache"><a href="#Guava-Cache" class="headerlink" title="Guava Cache"></a>Guava Cache</h2><p><img src="GuavaCache.png" alt="Guava Cache"><br>继承了ConcurrentHashMap的思路， 使用多个segment方式的细粒度锁保证线程安全和高并发的需求。 key被封装在weak reference引用中。 value被封装在weak或者soft reference引用中。 可以统计命中率， 异常率等统计数据</p>
-<h2 id="Memcache"><a href="#Memcache" class="headerlink" title="Memcache"></a>Memcache</h2><p><img src="memcache.png" alt="memcache"><br>应用广的开源分布式缓存产品， 本身不支持， cache的分布式主要在客户端实现。 客户端路由。 一致性哈希算法， 除了计算key的哈希值还计算每个mencahce server节点的哈希值。 通过查找哈希值大于key对应的hash值的最小server作为存储该key的目标server。 增加了虚拟节点的设计进一步提高高可用性</p>
-<h3 id="memcache内存结构"><a href="#memcache内存结构" class="headerlink" title="memcache内存结构"></a>memcache内存结构</h3><p><img src="memcache2.png" alt="memcache"></p>
-<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>支持</p>
+<h2 id="Memcache"><a href="#Memcache" class="headerlink" title="Memcache"></a>Memcache</h2><p><img src="memcache.png" alt="memcache"><br>应用广的开源分布式缓存产品， 本身不支持， cache的分布式主要在客户端实现。 客户端路由（一致性哈希算法）， 除了计算key的哈希值还计算每个mencahce server节点的哈希值。<br>通过查找哈希值大于key对应的hash值的最小server作为存储该key的目标server。<br>如果找不到直接把最小哈希值的server作为目标server， 增加删除单个节点不会对集群有大的影响。<br>增加了虚拟节点的设计进一步提高可用性。</p>
+<h3 id="memcache内存结构"><a href="#memcache内存结构" class="headerlink" title="memcache内存结构"></a>memcache内存结构</h3><p>memcache是一个高效的分布式内存cache， 了解内存结构能更高根据数据特点进行调优。<br><img src="memcache2.png" alt="memcache2"><br>每个slab有多个page， page默认大小为1M。 同一个slab中的chunk大小一定。 相同大小chunk的slab被组织在一起称为slab_class。<br>memcache内存分配的方式为allocater， slab数量有限和启动参数有关。 相邻slab的chunk大小基本按1.25比例增长（启动时-f 设定）。<br>放slab时候， slab以page为单位申请内存， page再按chunk大小进行切分， 得到chunk数组来存数据。<br>如果没有chunk了， 进行LRU把最近最少使用的chunk中的数据清理掉。 </p>
+<ul>
+<li>chunk中总会有内存浪费</li>
+<li>memcache的LRU算法不是针对全局， 只是针对slab的</li>
+<li>memcache只会以page（1M）的大小申请内存， 对新数据大小有限制， key最大为250个字节</li>
+<li>单进程32位机最大使用内存2G， 64位机没有限制</li>
+<li>不能遍历里面存的所有item。 过于缓慢还会阻塞其他操作</li>
+<li>memcache的高性能来源于两个阶段的hash结构，第一个阶段客户端通过key值算出一个节点，第二阶段在服务端查找item并返回客户端</li>
+</ul>
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p><img src="redis.png" alt="redis"><br>可以使用复制特性来扩展读性能， 主从备份<br>可以通过客户端分片提高些性能<br>读性能能到11万次每秒<br>写性能能到81000次每秒<br>支持操作原子性和几个操作合起来之后的原子性</p>
+<ol>
+<li>可以多个库， 最多16个， 数据能移动</li>
+<li>支持事务<br>multi开启事务， 所有操作会被加入队列中<br>exec开始执行<br>discard相当于rollback</li>
+</ol>
+<h3 id="五种数据类型"><a href="#五种数据类型" class="headerlink" title="五种数据类型"></a>五种数据类型</h3><ol>
+<li>字符串（String）<br>value最大长度512M<br>二进制安全的， 存入和获取数据相同<br>incr num 如果num不存在num默认为1， 之后incr递增。 还可以使用incrby。 如果不是整型就报错</li>
+<li>哈希（hash）</li>
+<li>字符串列表（list）<br>能在链表的头和尾插入和删除元素， 效率高。<br>可以使用arraylist方式存<br>或者linkedlist方式， 双向链表<br>可以用于消息队列的服务， 实现多个程序消息交互。rpoplpush, 实现一个备份队列， 防止消息没有被消费成功</li>
+<li>字符串集合（set）<br>不允许出现重复元素<br>差集运算 sdiff, 交集运算 sinter， 并集运算 sunion<br>唯一性场景（唯一的ip）， 数据集关联关系场景</li>
+<li>有序字符串集合（sorted set）<br>每一个成员都有一个分数关联用来排序， 成员值不能相同， 但是分数可以相同。 因为有序所以即使访问集合中部的成员也比较高效<br>游戏排名，构建索引数据， 微博热点可以用到。</li>
+</ol>
+<h3 id="持久化的方式"><a href="#持久化的方式" class="headerlink" title="持久化的方式"></a>持久化的方式</h3><ol>
+<li>RDB方式<br>默认支持，不需要配置， 在指定时间间隔内将内存中的数据及快照写入到磁盘。<br>优势： 灾难恢复容易， 启动效率更好<br>劣势： 写之前宕机， 数据就丢失了， 不能保证高可用； 因为通过子进程分叉的方式持久化， 数据量大的时候可能导致系统停止几百毫秒。<br>配置： save 60 10000 意思是每一分钟至少10000个key有变化就持久化一次     </li>
+<li>AOF方式<br>将以日志的方式记录服务器每一个操作， <em>在redis服务器启动之初会读取该文件重新构建数据库</em>。 保证启动后数据库中的数据是完整的。<br>优势： 更高的数据安全性， 数据一致性问题<br>劣势： aof文件比rdb文件大。 运行效率比较低<br>配置： appendonly no默认不打开 同步策略可以修改为always（每次修改同步一次, everysec(每秒同步一次)</li>
+<li>不持久化</li>
+<li>同时使用RDB AOF</li>
+</ol>
 </section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/10/09/数据库切库分库分表/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
