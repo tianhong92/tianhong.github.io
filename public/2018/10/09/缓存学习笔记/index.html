@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>缓存学习笔记</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>缓存学习笔记</h1><h2 class="headline">Oct 09, 2018 1:41·792 words
+·3 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#缓存特征"><span class="toc-text">缓存特征</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#影响缓存命中率的因素"><span class="toc-text">影响缓存命中率的因素</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存分类和应用场景"><span class="toc-text">缓存分类和应用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Guava-Cache"><span class="toc-text">Guava Cache</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Memcache"><span class="toc-text">Memcache</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#memcache内存结构"><span class="toc-text">memcache内存结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis"><span class="toc-text">Redis</span></a></li></ol></li></ol></div><section id="post-body"><h1 id="缓存特征"><a href="#缓存特征" class="headerlink" title="缓存特征"></a>缓存特征</h1><ul>
+<li>命中率： 命中数/(命中数+没有命中数)</li>
+<li>最大元素（空间）</li>
+</ul>
+<p>一旦数据超过最大元素将会触发缓存情况策略， 需要合理设置最大元素数量， 提高命中率和效率</p>
+<ul>
+<li>清空策略： FIFO, LFU, LRU, 过期时间， 随机等</li>
+</ul>
+<p>FIFO： 最先进入的数据当缓存不够， 或者达到最大元素限制时候会优先被清除掉， 主要比较元素的创建时间，     在数据实时性要求场景下可以选择该策略， 优先保证最新数据可用</p>
+<p>LFU： 无论是否过期， 根据元素使用次数来判断， 清除使用次数最少的元素来释放空间， 主要比较元素的命中次数，在保证高频数据有效性场景下可以使用</p>
+<p>LRU： 无论是否过期， 比较元素最近get时间， 删除最远使用的元素。 在热点数据场景下较适用</p>
+<h1 id="影响缓存命中率的因素"><a href="#影响缓存命中率的因素" class="headerlink" title="影响缓存命中率的因素"></a>影响缓存命中率的因素</h1><ul>
+<li>业务场景和业务需求： 适合读多写少的业务场景， 实时性越低越适合缓存</li>
+<li>缓存的设计（粒度和策略）： 粒度越小命中率就会越高， 更新缓存比移除命中率更高， 但是系统复杂度更高</li>
+<li>缓存的容量和基础设施： 应用内置的缓存比较容易出现单击瓶颈， 分布式缓存更容易扩展。 所以需要做好系统容量规划， 并考虑是否可扩展<br>单个节点出现故障的时候， 需要避免缓存失效， 最大程度降低影响。 可通过一致性哈希算法和节点冗余的方式来避免这个问题</li>
+</ul>
+<p>从架构师角度为了提高缓存命中率：<br>竟可能多的从缓存获取数据并避免缓存失效， 这比较考验架构师能力， 需要从业务需求， 缓存粒度， 缓存策略， 技术选型等方面通盘考虑权衡。 竟可能聚焦在高频访问并时效性要求不高的热点业务上。 通过缓存预加载（预热）， 增加存储容量， 调整缓存粒度， 更新缓存等方法来提高命中率。</p>
+<h2 id="缓存分类和应用场景"><a href="#缓存分类和应用场景" class="headerlink" title="缓存分类和应用场景"></a>缓存分类和应用场景</h2><ul>
+<li>本地缓存： 编程实现（成员变量， 局部变量， 静态变量）、 Guava Cache</li>
+<li>分布式缓存： Memcache、 Redis</li>
+</ul>
+<h2 id="Guava-Cache"><a href="#Guava-Cache" class="headerlink" title="Guava Cache"></a>Guava Cache</h2><p><img src="GuavaCache.png" alt="Guava Cache"><br>继承了ConcurrentHashMap的思路， 使用多个segment方式的细粒度锁保证线程安全和高并发的需求。 key被封装在weak reference引用中。 value被封装在weak或者soft reference引用中。 可以统计命中率， 异常率等统计数据</p>
+<h2 id="Memcache"><a href="#Memcache" class="headerlink" title="Memcache"></a>Memcache</h2><p><img src="memcache.png" alt="memcache"><br>应用广的开源分布式缓存产品， 本身不支持， cache的分布式主要在客户端实现。 客户端路由。 一致性哈希算法， 除了计算key的哈希值还计算每个mencahce server节点的哈希值。 通过查找哈希值大于key对应的hash值的最小server作为存储该key的目标server。 增加了虚拟节点的设计进一步提高高可用性</p>
+<h3 id="memcache内存结构"><a href="#memcache内存结构" class="headerlink" title="memcache内存结构"></a>memcache内存结构</h3><p><img src="memcache2.png" alt="memcache"></p>
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>支持</p>
+</section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/10/09/数据库切库分库分表/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
