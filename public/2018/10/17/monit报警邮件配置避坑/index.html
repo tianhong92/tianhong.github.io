@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>monit报警邮件配置闭坑</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>monit报警邮件配置闭坑</h1><h2 class="headline">Oct 17, 2018 5:30·228 words
+·1 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#monit报警邮件配置"><span class="toc-text">monit报警邮件配置</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#根据官方文档配置mailserver"><span class="toc-text">根据官方文档配置mailserver</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置mail-format"><span class="toc-text">配置mail-format</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置邮件接收者"><span class="toc-text">配置邮件接收者</span></a></li></ol></li></ol></div><section id="post-body"><h1 id="monit报警邮件配置"><a href="#monit报警邮件配置" class="headerlink" title="monit报警邮件配置"></a>monit报警邮件配置</h1><p>monit配置报警邮件， 现在以qq smtp服务为例。</p>
+<h2 id="根据官方文档配置mailserver"><a href="#根据官方文档配置mailserver" class="headerlink" title="根据官方文档配置mailserver"></a>根据官方文档配置mailserver</h2><pre><code>set mailserver smtp.qq.com port xx
+username &quot;qq号&quot; password &quot;不是密码是授权码&quot;
+using SSL
+</code></pre><h2 id="配置mail-format"><a href="#配置mail-format" class="headerlink" title="配置mail-format"></a>配置mail-format</h2><pre><code>set mail-format {
+    from: 454648xx@qq.com
+    subject: monit alert -- $EVENT
+    message: Date: $DATE
+         Description: $DESCRIPTION
+ }
+</code></pre><h2 id="配置邮件接收者"><a href="#配置邮件接收者" class="headerlink" title="配置邮件接收者"></a>配置邮件接收者</h2><pre><code>set alert xxxxxx@qq.com
+</code></pre><p>发现启动monit后eventqueue有日志但是没有收到邮件！ 百思不得其解！！<br>原来是因为： </p>
+<p><strong>随着网络上垃圾邮件的泛滥,越来越多的免费电子邮箱服务商对邮箱的安全策略进行了提升,有多种不同的方式,最常见的就是开启的SMTP授权功能</strong></p>
+<p>所以需要在qq邮箱里面开启SMTP服务，得到授权码。</p>
+<p><img src="stmp.png" alt="stmp"></p>
+<p>接收邮件服务器：imap.qq.com，使用SSL，端口号993<br>发送邮件服务器：smtp.qq.com，使用SSL，端口号465或587</p>
+</section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/10/09/缓存学习笔记/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
