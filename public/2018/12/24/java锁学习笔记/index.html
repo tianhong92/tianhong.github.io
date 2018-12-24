@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1"><title>java锁学习笔记</title><link rel="shortcut icon" href="/images/avatar.png"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css"><script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script></head><body><nav class="main-nav"><a href="/">Home</a><a href="/archives">Archives</a></nav><div class="profile"><section id="wrapper"><header id="header"><a href="/"><img class="2x" id="avatar" src="/images/avatar.png"></a><h1>Little by little, one travels far</h1><h2></h2></header></section></div><section class="post" id="wrapper"><article><header><h1>java锁学习笔记</h1><h2 class="headline">Dec 24, 2018 3:16·854 words
+·3 minutes read<span class="tags"></span></h2></header><div id="toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#内置锁基本问题"><span class="toc-text">内置锁基本问题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重量级锁"><span class="toc-text">重量级锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自旋锁"><span class="toc-text">自旋锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#缺点"><span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自适应自旋锁"><span class="toc-text">自适应自旋锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#缺点-1"><span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#轻量级锁"><span class="toc-text">轻量级锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#缺点-2"><span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#偏向锁"><span class="toc-text">偏向锁</span></a></li></ol></li></ol></div><section id="post-body"><h1 id="内置锁基本问题"><a href="#内置锁基本问题" class="headerlink" title="内置锁基本问题"></a>内置锁基本问题</h1><h2 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h2><p>内置锁及重量级锁在java中被抽象为监视器锁（monitor）在JDK1.6之前可以直接对底层操作系统中的互斥量（mutex）进行操作。 这种同步方式成本很高， 包括系统调用引起的<strong>内核态</strong>与<strong>用户态</strong>切换、线程阻塞造成的<strong>线程切换</strong>等 </p>
+<h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><p>内核态用户态切换不易优化， 通过自旋锁， 可以<strong>减少线程阻塞造成的线程切换</strong>（包括挂起线程和恢复线程）</p>
+<p>如果锁的粒度小， 那么锁持有时间短。 那么对于竞争这些锁而言， 因为锁阻塞造成线程切换的时间与锁持有的时间相当， 减少线程阻塞造成的线程切换， 能提高性能。</p>
+<ol>
+<li>当前线程竞争锁失败， 打算阻塞自己</li>
+<li>不阻塞， 自旋</li>
+<li>自旋同时重新竞争锁</li>
+<li>如果自旋结束前获得锁，则运行； 否则， 自旋结束后阻塞自己</li>
+</ol>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ol>
+<li>单核处理器， 或者线程多处理器少， 自旋会造成不少无畏的浪费</li>
+<li>自旋要占用cpu， 对于<strong>计算密集型任务</strong>， 这一优化通常得不偿失， 减少锁的使用时更好选择</li>
+<li>锁持有时间长， 竞争激烈的场景中， 应该主动禁用自旋锁</li>
+</ol>
+<h2 id="自适应自旋锁"><a href="#自适应自旋锁" class="headerlink" title="自适应自旋锁"></a>自适应自旋锁</h2><p>自适应意味自旋的时间不再固定了， 而是由前一次在同一个锁上的自旋时间及锁的拥有者的状态决定：<br>自适应自旋锁解决的是<strong>锁竞争时间不确定</strong>的问题。 JVM很难知道确切的锁竞争时间， 而交给用户分析就违反了JVM设计的初衷。 自适应自旋锁假定不同线程持有同一个锁对象的时间基本相同， 竞争程度趋于稳定， 因此， 可以根据上一次自旋的时间与结果调整下一次自旋的时间</p>
+<h3 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h3><p>如果默认的自旋次数设置不合理（过高或者过低）， 那么自适应过程很难收敛到合适的值</p>
+<h2 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h2><p>轻量级锁的目的是： <strong>减少无实际竞争情况下， 使用重量级锁产生的性能消耗</strong> 包括系统调用引起的内核态和用户态切换、线程阻塞造成的线程切换等。</p>
+<p>使用轻量级锁， 不需要申请互斥量， 而是使用CAS更新指向线程栈中的Lock Record, 如果更新成功则获取轻量级锁成功； 否则说明发生竞争， 膨胀为重量级锁</p>
+<h3 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h3><p>同自旋锁类似， 如果竞争激烈， 锁很快就膨胀为重量级锁， 维持轻量级锁的过程就浪费了</p>
+<h2 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h2><p>减少无竞争且只有一个线程使用锁情况下， 使用轻量级锁产生的性能消耗。 轻量级锁每次申请、释放锁都至少需要一次CAS， 但偏向锁只有初始化需要一次CAS<br>之后当前线程可以零成本直接获取锁； 否则， 说明有其他线程竞争， 膨胀为轻量级锁</p>
+<p>偏向锁无法使用自旋锁优化， 因为一旦有其他线程申请锁， 就破坏了偏向锁的假定</p>
+</section><nav id="post-nav"><span class="prev"></span><span class="next"><a href="/2018/12/24/java取模取余的区别/">Older Posts<span class="arrow">→</span></a></span></nav></article></section><footer id="footer"><div id="social"><a class="symbol" href="https://github.com/tianhong92"><i class="fa fa-github">&nbsp;</i></a><a class="symbol" href="mailto:tianhong229@gmail.com">   <i class="fa fa-envelope"></i></a></div><p class="small">© Copyright 2018 &nbsp;<i class="fa fa-heart" aria-hidden="true">&nbsp;KingSkyRainbow &nbsp</i></p></footer><script>hljs.initHighlightingOnLoad();</script></body></html>
